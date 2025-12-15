@@ -1,44 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { EventCard } from "@/components/event-card"
-
-const ALL_EVENTS = [
-  {
-    id: 1,
-    title: "Alumni Networking Night",
-    date: "Nov 20, 2024",
-    location: "San Francisco",
-    description: "Connect with fellow alumni over drinks and appetizers",
-  },
-  {
-    id: 2,
-    title: "Engineering Career Panel",
-    date: "Nov 25, 2024",
-    location: "Virtual",
-    description: "Industry leaders discuss trends and opportunities",
-  },
-  {
-    id: 3,
-    title: "Campus Reunion 2024",
-    date: "Dec 5, 2024",
-    location: "University Campus",
-    description: "Annual gathering of all classes",
-  },
-  {
-    id: 4,
-    title: "Technical Workshops",
-    date: "Dec 12, 2024",
-    location: "New York Office",
-    description: "Hands-on training in latest technologies",
-  },
-]
+import { AuthGuard } from "@/components/auth-guard"
+import { getEvents } from "@/services/events"
+import { format } from "date-fns"
 
 export default function EventsPage() {
   const router = useRouter()
-  const [events] = useState(ALL_EVENTS)
+  const [events, setEvents] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    try {
+      setIsLoading(true)
+      const data = await getEvents()
+      setEvents(data)
+      setError("")
+    } catch (err: any) {
+      setError(err.message || "Failed to load events")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatDate = (dateString: string | Date) => {
+    try {
+      const date = new Date(dateString)
+      return format(date, "MMM d, yyyy")
+    } catch {
+      return dateString.toString()
+    }
+  }
 
   const alumniNavItems = [
     { label: "Dashboard", href: "/alumni/dashboard", icon: "📊" },
@@ -50,27 +50,44 @@ export default function EventsPage() {
   ]
 
   return (
+    <AuthGuard requiredRole="alumni">
     <div className="flex gap-6 bg-background min-h-screen">
-      <Sidebar items={alumniNavItems} onLogout={() => router.push("/login")} title="Alumni" />
+        <Sidebar items={alumniNavItems} title="Alumni" />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl">
           <h1 className="text-3xl font-bold text-foreground mb-2">Events</h1>
           <p className="text-muted-foreground mb-8">Discover upcoming alumni events</p>
 
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+                {error}
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">Loading...</div>
+            ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {events.map((event) => (
               <EventCard
-                key={event.id}
+                    key={event._id}
                 title={event.title}
-                date={event.date}
+                    date={formatDate(event.date)}
                 location={event.location}
                 description={event.description}
               />
             ))}
+                {events.length === 0 && !isLoading && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>No events found</p>
+                  </div>
+                )}
           </div>
+            )}
         </div>
       </main>
     </div>
+    </AuthGuard>
   )
 }

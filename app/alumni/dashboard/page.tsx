@@ -1,26 +1,60 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { StatCard } from "@/components/stat-card"
 import { PremiumCard } from "@/components/premium-card"
 import { EventCard } from "@/components/event-card"
-import { JobCard } from "@/components/job-card"
-
-const EVENTS = [
-  { id: 1, title: "Networking Mixer", date: "Nov 20, 2024", location: "San Francisco" },
-  { id: 2, title: "Career Talks", date: "Nov 25, 2024", location: "Virtual" },
-]
-
-const JOBS = [
-  { id: 1, title: "Senior Engineer", company: "TechCorp", location: "SF", salary: "120k-150k" },
-  { id: 2, title: "Project Manager", company: "BuildCo", location: "NY", salary: "100k-130k" },
-]
+import { AuthGuard } from "@/components/auth-guard"
+import { getCurrentUser } from "@/services/auth"
+import { getEvents } from "@/services/events"
+import { getJobs } from "@/services/jobs"
+import { getAlumniStats } from "@/services/alumni"
+import { format } from "date-fns"
 
 export default function AlumniDashboard() {
   const router = useRouter()
   const [profileComplete] = useState(75)
+  const [user, setUser] = useState<any>(null)
+  const [events, setEvents] = useState<any[]>([])
+  const [jobs, setJobs] = useState<any[]>([])
+  const [stats, setStats] = useState<any>({ networkConnections: 0, profileViews: 0, savedJobs: 0 })
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const currentUser = getCurrentUser()
+    setUser(currentUser)
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
+      const [eventsData, jobsData, statsData] = await Promise.all([
+        getEvents().catch(() => []),
+        getJobs().catch(() => []),
+        // @ts-ignore
+        getAlumniStats().catch(() => ({ networkConnections: 0, profileViews: 0, savedJobs: 0 })),
+      ])
+      setEvents(eventsData.slice(0, 2)) // Show first 2
+      setJobs(jobsData.slice(0, 2)) // Show first 2
+      setStats(statsData)
+    } catch (error) {
+      console.error("Error fetching data:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatDate = (dateString: string | Date) => {
+    try {
+      const date = new Date(dateString)
+      return format(date, "MMM d, yyyy")
+    } catch {
+      return dateString.toString()
+    }
+  }
 
   const alumniNavItems = [
     { label: "Dashboard", href: "/alumni/dashboard", icon: "📊" },
@@ -32,14 +66,15 @@ export default function AlumniDashboard() {
   ]
 
   return (
+    <AuthGuard requiredRole="alumni">
     <div className="flex gap-6 bg-background min-h-screen">
-      <Sidebar items={alumniNavItems} onLogout={() => router.push("/login")} title="Alumni" />
+        <Sidebar items={alumniNavItems} title="Alumni" />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl">
           {/* Welcome Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Hello, John Doe</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Hello, {user?.name || "Alumni"}</h1>
             <p className="text-muted-foreground">Welcome back to your alumni portal</p>
           </div>
 
@@ -81,12 +116,12 @@ export default function AlumniDashboard() {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <StatCard label="Network Connections" value="284" icon="🤝" />
-            <StatCard label="Profile Views" value="1,247" icon="👁️" trend="up" trendValue="+23%" />
-            <StatCard label="Saved Jobs" value="12" icon="❤️" />
+            <StatCard label="Network Connections" value={String(stats.networkConnections)} icon="🤝" />
+            <StatCard label="Profile Views" value={String(stats.profileViews)} icon="👁️" trend="up" trendValue="" />
+            <StatCard label="Saved Jobs" value={String(stats.savedJobs)} icon="❤️" />
           </div>
 
-          {/* Upcoming Events & Jobs */}
+            {/* Upcoming Events & Network Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Events */}
             <div>
@@ -100,38 +135,46 @@ export default function AlumniDashboard() {
                 </button>
               </div>
               <div className="space-y-4">
-                {EVENTS.map((event) => (
-                  <EventCard key={event.id} title={event.title} date={event.date} location={event.location} />
-                ))}
+                {isLoading ? (
+                  <div className="text-muted-foreground">Loading events...</div>
+                ) : events.length > 0 ? (
+                  events.map((event) => (
+                    <EventCard key={event._id} title={event.title} date={formatDate(event.date)} location={event.location} />
+                  ))
+                ) : (
+                  <div className="text-muted-foreground text-sm">No upcoming events</div>
+                )}
               </div>
             </div>
 
-            {/* Recommended Jobs */}
+            {/* Network & Recent Activity (for Alumni) */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-foreground">Recommended Jobs</h2>
+                <h2 className="text-lg font-bold text-foreground">Network & Activity</h2>
                 <button
-                  onClick={() => router.push("/alumni/jobs")}
+                  onClick={() => router.push("/alumni/directory")}
                   className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
-                  View All
+                  View Directory
                 </button>
               </div>
+
               <div className="space-y-4">
-                {JOBS.map((job) => (
-                  <JobCard
-                    key={job.id}
-                    title={job.title}
-                    company={job.company}
-                    location={job.location}
-                    salary={job.salary}
-                  />
-                ))}
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Your Network</h3>
+                  <p className="text-sm text-muted-foreground">You have {stats.networkConnections} connections.</p>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Recent Activity</h3>
+                  <div className="text-sm text-muted-foreground">No recent activity to show</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
+    </AuthGuard>
   )
 }

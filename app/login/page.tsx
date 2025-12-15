@@ -1,33 +1,76 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { PremiumButton } from "@/components/premium-button"
 import { PremiumInput } from "@/components/premium-input"
 import { PremiumCard } from "@/components/premium-card"
 import Link from "next/link"
+import { login, isAuthenticated } from "@/services/auth"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
+
+  useEffect(() => {
+    // Only redirect if user has valid authentication data
+    // Check both token and user data exist
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem("token")
+      const userStr = localStorage.getItem("user")
+      
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr)
+          // Redirect based on role
+          if (user && user.role) {
+            if (user.role === "admin") {
+              router.push("/admin/dashboard")
+            } else if (user.role === "alumni" && user.status === "approved") {
+              router.push("/alumni/dashboard")
+            } else if (user.role === "student") {
+              router.push("/student/dashboard")
+            }
+          }
+        } catch (e) {
+          // Invalid user data, clear it
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+        }
+      }
+    }
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Mock authentication
-    setTimeout(() => {
-      if (email.includes("admin")) {
-        router.push("/admin/dashboard")
+    try {
+      const response = await login(email, password)
+      
+      if (response.success && response.data) {
+        // Redirect based on role
+        if (response.data.role === "admin") {
+          router.push("/admin/dashboard")
+        } else if (response.data.role === "alumni") {
+          router.push("/alumni/dashboard")
+        } else if (response.data.role === "student") {
+          router.push("/student/dashboard")
+        }
       } else {
-        router.push("/alumni/dashboard")
+        setError(response.message || "Login failed")
+        setIsLoading(false)
       }
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please try again.")
       setIsLoading(false)
-    }, 600)
+    }
   }
 
   return (
@@ -44,12 +87,20 @@ export default function LoginPage() {
           {/* Login Form */}
           <PremiumCard variant="elevated" className="mb-8">
             <form onSubmit={handleLogin} className="space-y-6">
+              {error && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+                  {error}
+                </div>
+              )}
               <PremiumInput
                 label="Email Address"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setError("")
+                }}
                 required
               />
               <PremiumInput
@@ -57,7 +108,10 @@ export default function LoginPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError("")
+                }}
                 required
               />
               <PremiumButton variant="primary" className="w-full" isLoading={isLoading}>
@@ -82,12 +136,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Demo Hint */}
-          <div className="mt-8 p-4 glass-sm rounded-lg border border-primary/20">
-            <p className="text-xs text-muted-foreground text-center mb-2">
-              Demo Tip: Use any email with "admin" to access admin panel
-            </p>
-          </div>
         </div>
       </div>
     </div>

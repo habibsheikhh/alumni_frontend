@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { PremiumButton } from "./premium-button"
+import { logout } from "@/services/auth"
 
 interface NavItem {
   label: string
@@ -21,6 +22,16 @@ interface SidebarProps {
 export function Sidebar({ items, onLogout, title = "Alumni" }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true)
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    if (onLogout) {
+      onLogout()
+    } else {
+      router.push("/login")
+    }
+  }
 
   return (
     <div
@@ -73,13 +84,11 @@ export function Sidebar({ items, onLogout, title = "Alumni" }: SidebarProps) {
       </nav>
 
       {/* Logout */}
-      {onLogout && (
         <div className="border-t border-border pt-4">
-          <PremiumButton variant="outline" size="sm" onClick={onLogout} className={cn("w-full", !isOpen && "p-2")}>
+        <PremiumButton variant="outline" size="sm" onClick={handleLogout} className={cn("w-full", !isOpen && "p-2")}>
             {isOpen ? "Logout" : "←"}
           </PremiumButton>
         </div>
-      )}
     </div>
   )
 }

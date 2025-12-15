@@ -8,6 +8,7 @@ import { PremiumButton } from "@/components/premium-button"
 import { PremiumInput } from "@/components/premium-input"
 import { PremiumCard } from "@/components/premium-card"
 import Link from "next/link"
+import { signup, login } from "@/services/auth"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -15,11 +16,13 @@ export default function SignupPage() {
     email: "",
     password: "",
     graduationYear: "",
+    role: "alumni",
     company: "",
     location: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,17 +30,55 @@ export default function SignupPage() {
       ...formData,
       [e.target.name]: e.target.value,
     })
+    setError("")
   }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Mock registration
-    setTimeout(() => {
-      setIsSubmitted(true)
+    try {
+      const payload: any = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        company: formData.company || "",
+        location: formData.location || "",
+        role: formData.role || 'alumni',
+      }
+
+      if (formData.role === 'alumni') {
+        payload.graduation_year = parseInt(formData.graduationYear)
+      }
+
+      const response = await signup(payload)
+
+      if (response.success && response.data) {
+        // If student, auto-login and redirect to student dashboard
+        if (response.data.role === 'student' && response.data.status === 'approved') {
+          try {
+            const loginResp = await login(formData.email, formData.password)
+            if (loginResp.success) {
+              // Redirect to student dashboard
+              router.push('/student/dashboard')
+              return
+            }
+          } catch (e) {
+            // ignore and fallthrough to show submitted message
+          }
+        }
+
+        // Default: show submitted message (alumni pending)
+        setIsSubmitted(true)
+      } else {
+        setError(response.message || "Registration failed")
+        setIsLoading(false)
+      }
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.")
       setIsLoading(false)
-    }, 600)
+    }
   }
 
   if (isSubmitted) {
@@ -74,12 +115,17 @@ export default function SignupPage() {
           {/* Welcome Section */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-2">Join Our Network</h1>
-            <p className="text-muted-foreground">Create your alumni profile today</p>
+            <p className="text-muted-foreground">{formData.role === 'student' ? 'Create a student account' : 'Create your alumni profile today'}</p>
           </div>
 
           {/* Signup Form */}
           <PremiumCard variant="elevated" className="mb-8">
             <form onSubmit={handleSignup} className="space-y-4">
+              {error && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+                  {error}
+                </div>
+              )}
               <PremiumInput
                 label="Full Name"
                 type="text"
@@ -106,7 +152,21 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                minLength={6}
               />
+
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Account Type</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md bg-input text-foreground"
+                >
+                  <option value="alumni">Alumni</option>
+                  <option value="student">Student</option>
+                </select>
+              </div>
               <PremiumInput
                 label="Graduation Year"
                 type="number"
@@ -114,7 +174,7 @@ export default function SignupPage() {
                 placeholder="2023"
                 value={formData.graduationYear}
                 onChange={handleChange}
-                required
+                required={formData.role === 'alumni'}
               />
               <PremiumInput
                 label="Company"

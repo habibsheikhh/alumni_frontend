@@ -1,66 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { JobCard } from "@/components/job-card"
 import { PremiumInput } from "@/components/premium-input"
-
-const ALL_JOBS = [
-  {
-    id: 1,
-    title: "Senior Civil Engineer",
-    company: "TechCorp",
-    location: "San Francisco",
-    salary: "120k-150k",
-    description: "Lead infrastructure projects",
-  },
-  {
-    id: 2,
-    title: "Infrastructure Analyst",
-    company: "BuildCo",
-    location: "New York",
-    salary: "90k-110k",
-    description: "Analyze and improve systems",
-  },
-  {
-    id: 3,
-    title: "Project Manager",
-    company: "Engineering Plus",
-    location: "Boston",
-    salary: "100k-130k",
-    description: "Manage major construction projects",
-  },
-  {
-    id: 4,
-    title: "Design Engineer",
-    company: "Infra Solutions",
-    location: "Chicago",
-    salary: "85k-105k",
-    description: "Design sustainable infrastructure",
-  },
-  {
-    id: 5,
-    title: "Junior Engineer",
-    company: "Tech Solutions",
-    location: "Austin",
-    salary: "70k-85k",
-    description: "Support engineering team",
-  },
-  {
-    id: 6,
-    title: "Consultant",
-    company: "Strategy Co",
-    location: "Remote",
-    salary: "95k-120k",
-    description: "Advisory services for clients",
-  },
-]
+import { AuthGuard } from "@/components/auth-guard"
+import { getJobs } from "@/services/jobs"
 
 export default function JobsPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
-  const [jobs] = useState(ALL_JOBS)
+  const [jobs, setJobs] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    fetchJobs()
+  }, [])
+
+  const fetchJobs = async () => {
+    try {
+      setIsLoading(true)
+      const data = await getJobs()
+      setJobs(data)
+      setError("")
+    } catch (err: any) {
+      setError(err.message || "Failed to load jobs")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const alumniNavItems = [
     { label: "Dashboard", href: "/alumni/dashboard", icon: "📊" },
@@ -78,13 +48,20 @@ export default function JobsPage() {
   )
 
   return (
+    <AuthGuard requiredRole="alumni">
     <div className="flex gap-6 bg-background min-h-screen">
-      <Sidebar items={alumniNavItems} onLogout={() => router.push("/login")} title="Alumni" />
+        <Sidebar items={alumniNavItems} title="Alumni" />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl">
           <h1 className="text-3xl font-bold text-foreground mb-2">Job Opportunities</h1>
           <p className="text-muted-foreground mb-8">Browse career opportunities from our alumni network</p>
+
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+              {error}
+            </div>
+          )}
 
           <div className="mb-8">
             <PremiumInput
@@ -94,10 +71,14 @@ export default function JobsPage() {
             />
           </div>
 
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          ) : (
+            <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredJobs.map((job) => (
               <JobCard
-                key={job.id}
+                    key={job._id}
                 title={job.title}
                 company={job.company}
                 location={job.location}
@@ -107,13 +88,16 @@ export default function JobsPage() {
             ))}
           </div>
 
-          {filteredJobs.length === 0 && (
+              {filteredJobs.length === 0 && !isLoading && (
             <div className="text-center text-muted-foreground">
               <p>No jobs found matching your search</p>
             </div>
+              )}
+            </>
           )}
         </div>
       </main>
     </div>
+    </AuthGuard>
   )
 }
