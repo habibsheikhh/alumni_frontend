@@ -8,8 +8,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Alumni Management System",
-  description: "Civil Engineering Alumni Network Portal",
+  title: "Stumini Management System",
+  description: "Civil Engineering Stumini Network Portal",
   generator: "v0.app",
   icons: {
     icon: [

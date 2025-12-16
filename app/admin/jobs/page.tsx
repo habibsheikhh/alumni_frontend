@@ -38,7 +38,7 @@ export default function JobsPage() {
   const adminNavItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: "📊" },
     { label: "Approvals", href: "/admin/approvals", icon: "✓" },
-    { label: "Alumni", href: "/admin/alumni", icon: "👥" },
+    { label: "Stumini", href: "/admin/alumni", icon: "👥" },
     { label: "Events", href: "/admin/events", icon: "🎯" },
     { label: "Jobs", href: "/admin/jobs", icon: "💼" },
     { label: "Announcements", href: "/admin/announcements", icon: "📢" },

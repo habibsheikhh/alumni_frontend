@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/sidebar"
 import { PremiumCard } from "@/components/premium-card"
 import { PremiumButton } from "@/components/premium-button"
 import { AuthGuard } from "@/components/auth-guard"
-import { getPendingAlumni, approveAlumni, rejectAlumni } from "@/services/alumni"
+import { getPendingStumini, approveStumini, rejectStumini } from "@/services/stumini"
 
 export default function ApprovalsPage() {
   const router = useRouter()
@@ -24,17 +24,17 @@ export default function ApprovalsPage() {
   ]
 
   useEffect(() => {
-    fetchPendingAlumni()
+    fetchPendingStumini()
   }, [])
 
-  const fetchPendingAlumni = async () => {
+  const fetchPendingStumini = async () => {
     try {
       setIsLoading(true)
-      const data = await getPendingAlumni()
+      const data = await getPendingStumini()
       setAlumni(data)
       setError("")
     } catch (err: any) {
-      setError(err.message || "Failed to load pending alumni")
+      setError(err.message || "Failed to load pending stumini")
     } finally {
       setIsLoading(false)
     }
@@ -42,21 +42,21 @@ export default function ApprovalsPage() {
 
   const handleApprove = async (id: string) => {
     try {
-      await approveAlumni(id)
+      await approveStumini(id)
       setAlumni(alumni.filter((a) => a._id !== id))
       setError("")
     } catch (err: any) {
-      setError(err.message || "Failed to approve alumni")
+      setError(err.message || "Failed to approve stumini")
     }
   }
 
   const handleReject = async (id: string) => {
     try {
-      await rejectAlumni(id)
+      await rejectStumini(id)
       setAlumni(alumni.filter((a) => a._id !== id))
       setError("")
     } catch (err: any) {
-      setError(err.message || "Failed to reject alumni")
+      setError(err.message || "Failed to reject stumini")
     }
   }
 
@@ -68,7 +68,7 @@ export default function ApprovalsPage() {
           <div className="max-w-7xl">
             <h1 className="text-3xl font-bold text-foreground mb-2">Pending Approvals</h1>
             <p className="text-muted-foreground mb-8">
-              Review and approve {alumni.length} alumni registration{alumni.length !== 1 ? "s" : ""}
+              Review and approve {alumni.length} stumini registration{alumni.length !== 1 ? "s" : ""}
             </p>
 
             {error && (
@@ -114,8 +114,8 @@ export default function ApprovalsPage() {
 
                 {alumni.length === 0 && !isLoading && (
                   <PremiumCard variant="default" className="text-center py-12">
-                    <p className="text-muted-foreground text-lg">No pending approvals</p>
-                    <p className="text-xs text-muted-foreground mt-2">All alumni registrations are approved</p>
+                      <p className="text-muted-foreground text-lg">No pending approvals</p>
+                        <p className="text-xs text-muted-foreground mt-2">All stumini registrations are approved</p>
                   </PremiumCard>
                 )}
               </>

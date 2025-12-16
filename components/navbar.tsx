@@ -5,7 +5,7 @@ interface NavbarProps {
   description?: string
 }
 
-export function Navbar({ title = "Alumni Management System", description }: NavbarProps) {
+export function Navbar({ title = "Stumini Management System", description }: NavbarProps) {
   return (
     <nav className="glass soft-shadow border-b border-border/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">

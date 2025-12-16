@@ -7,7 +7,7 @@ import { PremiumCard } from "@/components/premium-card"
 import { PremiumButton } from "@/components/premium-button"
 import { PremiumInput } from "@/components/premium-input"
 import { AuthGuard } from "@/components/auth-guard"
-import { getAlumni } from "@/services/alumni"
+import { getStumini } from "@/services/stumini"
 
 export default function AlumniPage() {
   const router = useRouter()
@@ -17,17 +17,17 @@ export default function AlumniPage() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    fetchAlumni()
+    fetchStumini()
   }, [])
 
-  const fetchAlumni = async () => {
+  const fetchStumini = async () => {
     try {
       setIsLoading(true)
-      const data = await getAlumni()
+      const data = await getStumini()
       setAlumni(data)
       setError("")
     } catch (err: any) {
-      setError(err.message || "Failed to load alumni")
+      setError(err.message || "Failed to load stumini")
     } finally {
       setIsLoading(false)
     }
@@ -36,7 +36,7 @@ export default function AlumniPage() {
   const adminNavItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: "📊" },
     { label: "Approvals", href: "/admin/approvals", icon: "✓" },
-    { label: "Alumni", href: "/admin/alumni", icon: "👥" },
+    { label: "Stumini", href: "/admin/alumni", icon: "👥" },
     { label: "Events", href: "/admin/events", icon: "🎯" },
     { label: "Jobs", href: "/admin/jobs", icon: "💼" },
     { label: "Announcements", href: "/admin/announcements", icon: "📢" },
@@ -56,10 +56,10 @@ export default function AlumniPage() {
         <div className="max-w-7xl">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Alumni Directory</h1>
-              <p className="text-muted-foreground">Manage all registered alumni</p>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Stumini Directory</h1>
+              <p className="text-muted-foreground">Manage all registered stumini</p>
             </div>
-            <PremiumButton variant="primary">Add Alumni</PremiumButton>
+            <PremiumButton variant="primary">Add Stumini</PremiumButton>
           </div>
 
           {error && (
@@ -113,7 +113,7 @@ export default function AlumniPage() {
 
               {filteredAlumni.length === 0 && !isLoading && (
             <PremiumCard variant="default" className="text-center py-12">
-              <p className="text-muted-foreground">No alumni found</p>
+              <p className="text-muted-foreground">No stumini found</p>
             </PremiumCard>
               )}
             </>

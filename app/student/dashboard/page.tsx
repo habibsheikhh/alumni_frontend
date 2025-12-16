@@ -8,7 +8,7 @@ import { PremiumCard } from "@/components/premium-card"
 import { ProfileCard } from "@/components/profile-card"
 import { AuthGuard } from "@/components/auth-guard"
 import { getJobs } from "@/services/jobs"
-import { getAlumni } from "@/services/alumni"
+import { getStumini } from "@/services/stumini"
 
 export default function StudentDashboard() {
   const [jobs, setJobs] = useState<any[]>([])
@@ -36,7 +36,7 @@ export default function StudentDashboard() {
   const fetchMentors = async () => {
     try {
       setMentorsLoading(true)
-      const data = await getAlumni()
+      const data = await getStumini()
       // show a small selection of approved alumni as recommended mentors
       setMentors(data.slice(0, 6))
     } catch (err) {

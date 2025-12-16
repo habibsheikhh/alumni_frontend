@@ -10,7 +10,7 @@ import { AuthGuard } from "@/components/auth-guard"
 import { getCurrentUser } from "@/services/auth"
 import { getEvents } from "@/services/events"
 import { getJobs } from "@/services/jobs"
-import { getAlumniStats } from "@/services/alumni"
+import { getStuminiStats } from "@/services/stumini"
 import { format } from "date-fns"
 
 export default function AlumniDashboard() {
@@ -35,7 +35,7 @@ export default function AlumniDashboard() {
         getEvents().catch(() => []),
         getJobs().catch(() => []),
         // @ts-ignore
-        getAlumniStats().catch(() => ({ networkConnections: 0, profileViews: 0, savedJobs: 0 })),
+        getStuminiStats().catch(() => ({ networkConnections: 0, profileViews: 0, savedJobs: 0 })),
       ])
       setEvents(eventsData.slice(0, 2)) // Show first 2
       setJobs(jobsData.slice(0, 2)) // Show first 2
@@ -68,14 +68,14 @@ export default function AlumniDashboard() {
   return (
     <AuthGuard requiredRole="alumni">
     <div className="flex gap-6 bg-background min-h-screen">
-        <Sidebar items={alumniNavItems} title="Alumni" />
+        <Sidebar items={alumniNavItems} title="Stumini" />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl">
           {/* Welcome Section */}
           <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">Hello, {user?.name || "Alumni"}</h1>
-            <p className="text-muted-foreground">Welcome back to your alumni portal</p>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Hello, {user?.name || "Stumini"}</h1>
+            <p className="text-muted-foreground">Welcome back to your Stumini portal</p>
           </div>
 
           {/* Profile Completeness */}
@@ -147,7 +147,7 @@ export default function AlumniDashboard() {
               </div>
             </div>
 
-            {/* Network & Recent Activity (for Alumni) */}
+            {/* Network & Recent Activity (for Stumini) */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-foreground">Network & Activity</h2>

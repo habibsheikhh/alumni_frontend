@@ -115,7 +115,7 @@ export default function SignupPage() {
           {/* Welcome Section */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-2">Join Our Network</h1>
-            <p className="text-muted-foreground">{formData.role === 'student' ? 'Create a student account' : 'Create your alumni profile today'}</p>
+            <p className="text-muted-foreground">{formData.role === 'student' ? 'Create a student account' : 'Create your Stumini profile today'}</p>
           </div>
 
           {/* Signup Form */}
@@ -163,7 +163,7 @@ export default function SignupPage() {
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md bg-input text-foreground"
                 >
-                  <option value="alumni">Alumni</option>
+                  <option value="alumni">Stumini</option>
                   <option value="student">Student</option>
                 </select>
               </div>

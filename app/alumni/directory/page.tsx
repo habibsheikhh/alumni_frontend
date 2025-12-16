@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/sidebar"
 import { ProfileCard } from "@/components/profile-card"
 import { PremiumInput } from "@/components/premium-input"
 import { AuthGuard } from "@/components/auth-guard"
-import { getAlumni } from "@/services/alumni"
+import { getStumini } from "@/services/stumini"
 
 export default function DirectoryPage() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function DirectoryPage() {
   const fetchAlumni = async () => {
     try {
       setIsLoading(true)
-      const data = await getAlumni()
+      const data = await getStumini()
       setAlumni(data)
       setError("")
     } catch (err: any) {
@@ -50,11 +50,11 @@ export default function DirectoryPage() {
   return (
     <AuthGuard requiredRole="alumni">
     <div className="flex gap-6 bg-background min-h-screen">
-        <Sidebar items={alumniNavItems} title="Alumni" />
+        <Sidebar items={alumniNavItems} title="Stumini" />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Alumni Directory</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Stumini Directory</h1>
           <p className="text-muted-foreground mb-8">Connect with fellow graduates</p>
 
           {error && (
@@ -81,7 +81,7 @@ export default function DirectoryPage() {
                     key={person._id}
                     name={person.name}
                     image={person.profile_photo_url}
-                    position={person.company || "Alumni"}
+                    position={person.company || "Stumini"}
                     company={person.location || ""}
                   />
             ))}
@@ -89,7 +89,7 @@ export default function DirectoryPage() {
 
               {filteredAlumni.length === 0 && !isLoading && (
             <div className="text-center text-muted-foreground">
-              <p>No alumni found matching your search</p>
+              <p>No stumini found matching your search</p>
             </div>
               )}
             </>

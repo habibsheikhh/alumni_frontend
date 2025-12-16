@@ -6,7 +6,7 @@ import { PremiumCard } from "@/components/premium-card"
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar title="Alumni Network" description="Connect • Share • Grow" />
+      <Navbar title="Stumini Network" description="Connect • Share • Grow" />
 
       <main className="max-w-7xl mx-auto px-6 py-16">
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -15,7 +15,7 @@ export default function HomePage() {
               Reconnect with your classmates. Grow your network.
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Alumni Network helps you find fellow graduates, discover events, and explore career opportunities — all in one place.
+              Stumini helps you find fellow graduates, discover events, and explore career opportunities — all in one place.
             </p>
 
             <div className="flex gap-4">
@@ -38,7 +38,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-bold text-foreground">Featured Event</h3>
-                    <p className="text-sm text-muted-foreground">Alumni Homecoming — Oct 20</p>
+                    <p className="text-sm text-muted-foreground">Stumini Homecoming — Oct 20</p>
                   </div>
                   <div className="text-sm text-primary font-semibold">Register</div>
                 </div>
@@ -59,7 +59,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <PremiumCard className="text-center">
               <div className="text-2xl mb-2">👥</div>
-              <h4 className="font-semibold">Find Alumni</h4>
+              <h4 className="font-semibold">Find Stumini</h4>
               <p className="text-sm text-muted-foreground">Search the directory by name, company or grad year.</p>
             </PremiumCard>
 
@@ -78,7 +78,7 @@ export default function HomePage() {
             <PremiumCard className="text-center">
               <div className="text-2xl mb-2">💼</div>
               <h4 className="font-semibold">Explore Jobs</h4>
-              <p className="text-sm text-muted-foreground">Find career opportunities posted by alumni and partners.</p>
+              <p className="text-sm text-muted-foreground">Find career opportunities posted by stumini and partners.</p>
             </PremiumCard>
           </div>
         </section>

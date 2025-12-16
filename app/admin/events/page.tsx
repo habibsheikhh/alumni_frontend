@@ -39,7 +39,7 @@ export default function EventsPage() {
   const adminNavItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: "📊" },
     { label: "Approvals", href: "/admin/approvals", icon: "✓" },
-    { label: "Alumni", href: "/admin/alumni", icon: "👥" },
+    { label: "Stumini", href: "/admin/alumni", icon: "👥" },
     { label: "Events", href: "/admin/events", icon: "🎯" },
     { label: "Jobs", href: "/admin/jobs", icon: "💼" },
     { label: "Announcements", href: "/admin/announcements", icon: "📢" },
@@ -63,7 +63,7 @@ export default function EventsPage() {
             <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Events Management</h1>
-              <p className="text-muted-foreground">Create and manage alumni events</p>
+              <p className="text-muted-foreground">Create and manage stumini events</p>
             </div>
             <PremiumButton variant="primary" onClick={() => setShowForm((s) => !s)}>{showForm ? 'Cancel' : 'Create Event'}</PremiumButton>
           </div>

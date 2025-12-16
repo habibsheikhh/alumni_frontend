@@ -19,7 +19,7 @@ interface SidebarProps {
   title?: string
 }
 
-export function Sidebar({ items, onLogout, title = "Alumni" }: SidebarProps) {
+export function Sidebar({ items, onLogout, title = "Stumini" }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
@@ -48,7 +48,7 @@ export function Sidebar({ items, onLogout, title = "Alumni" }: SidebarProps) {
               C
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-foreground">Alumni</span>
+              <span className="text-sm font-bold text-foreground">Stumini</span>
               <span className="text-xs text-muted-foreground">System</span>
             </div>
           </div>

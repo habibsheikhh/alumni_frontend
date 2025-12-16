@@ -7,7 +7,7 @@ import { StatCard } from "@/components/stat-card"
 import { PremiumCard } from "@/components/premium-card"
 import { PremiumButton } from "@/components/premium-button"
 import { AuthGuard } from "@/components/auth-guard"
-import { getPendingAlumni } from "@/services/alumni"
+import { getPendingStumini } from "@/services/stumini"
 import { getEvents } from "@/services/events"
 import { getJobs } from "@/services/jobs"
 
@@ -25,10 +25,10 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       const [pending, events, jobs, alumni] = await Promise.all([
-        getPendingAlumni().catch(() => []),
+        getPendingStumini().catch(() => []),
         getEvents().catch(() => []),
         getJobs().catch(() => []),
-        getPendingAlumni().catch(() => []),
+        getPendingStumini().catch(() => []),
       ])
       setPendingApprovals(pending.length)
       setTotalEvents(events.length)
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
   const adminNavItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: "📊" },
     { label: "Approvals", href: "/admin/approvals", icon: "✓" },
-    { label: "Alumni", href: "/admin/alumni", icon: "👥" },
+    { label: "Stumini", href: "/admin/alumni", icon: "👥" },
     { label: "Events", href: "/admin/events", icon: "🎯" },
     { label: "Jobs", href: "/admin/jobs", icon: "💼" },
     { label: "Announcements", href: "/admin/announcements", icon: "📢" },
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard label="Total Alumni" value={totalAlumni.toString()} icon="👥" />
+            <StatCard label="Total Stumini" value={totalAlumni.toString()} icon="👥" />
             <StatCard label="Pending Approvals" value={pendingApprovals.toString()} icon="⏳" />
             <StatCard label="Active Events" value={totalEvents.toString()} icon="🎯" />
             <StatCard label="Job Posts" value={totalJobs.toString()} icon="💼" />
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
             {/* Pending Approvals */}
             <PremiumCard variant="default">
               <h2 className="text-lg font-bold text-foreground mb-4">Pending Approvals</h2>
-              <p className="text-muted-foreground text-sm mb-6">{pendingApprovals} alumni waiting for approval</p>
+              <p className="text-muted-foreground text-sm mb-6">{pendingApprovals} stumini waiting for approval</p>
               <PremiumButton variant="primary" className="w-full" onClick={() => router.push("/admin/approvals")}>
                 Review Approvals
               </PremiumButton>
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
             <PremiumCard variant="default">
               <h2 className="text-lg font-bold text-foreground mb-4">Recent Activity</h2>
               <div className="space-y-3 text-sm">
-                <p className="text-muted-foreground">• 42 alumni viewed profiles today</p>
+                <p className="text-muted-foreground">• 42 stumini viewed profiles today</p>
                 <p className="text-muted-foreground">• 12 new job applications</p>
                 <p className="text-muted-foreground">• 3 events created this week</p>
               </div>
